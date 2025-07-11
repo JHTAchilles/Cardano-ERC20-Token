@@ -7,8 +7,7 @@ pub type SetupTokenDatum {
 // Spend Redeemer
 
 pub type SpendingAction {
-  MintErc20
-  BurnErc20
+  MintBurnErc20
   BurnSetup
 }
 

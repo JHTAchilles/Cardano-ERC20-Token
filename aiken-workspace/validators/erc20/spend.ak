@@ -23,54 +23,70 @@ validator erc20(
     // 1. Input Validation
     // find own input
     expect Some(own_input) = find_input(inputs, input)
+
     // check if setup input included in inputs
     expect [_setup_input] =
       inputs_at_with(inputs, own_input.output.address, setup_policy_id, "")
-
-    when rdmr is {
-      BurnSetup -> {}
-
-    }
-    // check if minted erc20
-    expect [Pair(_asset_name, mint_amount)] =
-      mint
-        |> assets.tokens(erc20_token_policy)
-        |> dict.to_pairs()
 
     // get input datum
     expect InlineDatum(raw_input_datum) = own_input.output.datum
     expect input_datum: SetupTokenDatum = raw_input_datum
 
-    // check whether mint exceed cap
-    let updated_supply = input_datum.current_supply + mint_amount
-    let is_under_cap = updated_supply <= cap
+    when rdmr is {
+      BurnSetup -> {
+        // check if minting setup token
+        expect [Pair(_asset_name, mint_quantity)] =
+          mint
+            |> assets.tokens(setup_policy_id)
+            |> dict.to_pairs()
 
-    //2. Output Validation
-    let filtered_outputs =
-      outputs_at_with(outputs, own_input.output.address, setup_policy_id, "")
-
-    // get updated current supply from output datum and check for single output
-    let output_updated_supply =
-      when filtered_outputs is {
-        [only_output] -> {
-          expect InlineDatum(setup_output_datum) = only_output.datum
-          expect output_datum: SetupTokenDatum = setup_output_datum
-          output_datum.current_supply
-        }
-        [] -> {
-          trace @"no output with own address"
-          fail
-        }
-        _ -> {
-          trace @"multiple outputs"
-          fail
-        }
+        mint_quantity == -1 && input_datum.current_supply == 0
       }
 
-    // check for updated datum
-    let is_output_correct = (updated_supply == output_updated_supply)?
+      MintBurnErc20 -> {
+        // check if minted erc20
+        expect [Pair(_asset_name, mint_quantity)] =
+          mint
+            |> assets.tokens(erc20_token_policy)
+            |> dict.to_pairs()
 
-    is_under_cap? && is_output_correct?
+        // check whether mint exceed cap
+        let updated_supply = input_datum.current_supply + mint_quantity
+        let is_under_cap = updated_supply <= cap
+
+        //2. Output Validation
+        let filtered_outputs =
+          outputs_at_with(
+            outputs,
+            own_input.output.address,
+            setup_policy_id,
+            "",
+          )
+
+        // get updated current supply from output datum and check for single output
+        let output_updated_supply =
+          when filtered_outputs is {
+            [only_output] -> {
+              expect InlineDatum(setup_output_datum) = only_output.datum
+              expect output_datum: SetupTokenDatum = setup_output_datum
+              output_datum.current_supply
+            }
+            [] -> {
+              trace @"no output with own address"
+              fail
+            }
+            _ -> {
+              trace @"multiple outputs"
+              fail
+            }
+          }
+
+        // check for updated datum
+        let is_output_correct = (updated_supply == output_updated_supply)?
+
+        is_under_cap? && is_output_correct?
+      }
+    }
   }
 
   else(_) {
