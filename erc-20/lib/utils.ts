@@ -6,6 +6,11 @@ import {
 } from "@meshsdk/core";
 import { SetupUtxos } from "./types";
 import { SetupTokenDatum } from "./bar";
+import { scripts } from "./constant";
+
+export const update = (val: string, setFunc: Function) => {
+	setFunc(val);
+};
 
 export const getSetupUtxo = (paramUtxo: UTxO): SetupUtxos => {
 	const txHash = paramUtxo.input.txHash;
@@ -14,7 +19,27 @@ export const getSetupUtxo = (paramUtxo: UTxO): SetupUtxos => {
 	return { txHash, outputIndex };
 };
 
+// export const getCurrentQuantity = async (setupUtxo: UTxO): Promise<number> => {
+// 	const setupTxIndex: SetupUtxos = getSetupUtxo(setupUtxo);
+
+// 	const setupTokenPolicyId = scripts(setupTxIndex).setup.mint.hash;
+// 	const scriptAddress = scripts(setupTxIndex).erc20.spend.address;
+
+// 	const blockfrost = getBlockFrost()!;
+// 	const scriptUtxos: UTxO[] = await blockfrost.fetchAddressUTxOs(
+// 		scriptAddress,
+// 		setupTokenPolicyId
+// 	);
+// 	console.log(
+// 		"getting script utxo under spending script address: ",
+// 		scriptUtxos
+// 	);
+// 	const currentQuantity: number = getSetupDatum(scriptUtxos[0]);
+// 	return currentQuantity;
+// };
+
 export const getSetupDatum = (SetupUtxo: UTxO): number => {
+	console.log("getting script utxo under spending script address: ", SetupUtxo);
 	const plutusData = SetupUtxo.output.plutusData!;
 	const datum: SetupTokenDatum = deserializeDatum(plutusData);
 

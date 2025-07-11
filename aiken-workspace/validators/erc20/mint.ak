@@ -2,10 +2,10 @@ use aiken/collection/dict
 use cardano/assets.{PolicyId}
 use cardano/transaction.{Transaction} as tx
 use cocktail.{inputs_with}
-use types.{Action, Burn, Mint}
+use types.{Burn, Mint, MintingAction}
 
 validator erc20(setup_policy_id: PolicyId) {
-  mint(rdmr: Action, erc20_policy_id: PolicyId, tx: Transaction) {
+  mint(rdmr: MintingAction, erc20_policy_id: PolicyId, tx: Transaction) {
     let Transaction { inputs, mint, .. } = tx
     expect [Pair(_asset_name, mint_amount)] =
       mint

@@ -5,7 +5,7 @@ use cardano/transaction.{
   InlineDatum, Output, OutputReference, Transaction, find_input,
 } as tx
 use cocktail.{inputs_at_with, outputs_at_with}
-use types.{SetupTokenDatum, SpendingAction}
+use types.{BurnSetup, MintBurnErc20, SetupTokenDatum, SpendingAction}
 
 validator erc20(
   cap: Int,
@@ -40,6 +40,7 @@ validator erc20(
             |> assets.tokens(setup_policy_id)
             |> dict.to_pairs()
 
+        // ensure all erc20 tokens are burnt before destroy setup token
         mint_quantity == -1 && input_datum.current_supply == 0
       }
 

@@ -1,6 +1,6 @@
 import { OfflineEvaluator } from "@meshsdk/core-csl";
 import { IWallet, UTxO } from "@meshsdk/core";
-import { rBurn, SetupUtxos } from "../../lib/types";
+import { rBurn, rBurnSetup, SetupUtxos } from "../../lib/types";
 import { scripts, setupTokenDatum } from "../../lib/constant";
 import { hardCodedUtxo } from "./test";
 import {
@@ -10,7 +10,7 @@ import {
 	newTxBuilder,
 } from "../../lib/utils";
 
-export const burnERC20Token = async (wallet: IWallet) => {
+export const burnSetupToken = async (wallet: IWallet) => {
 	console.log(process.env.NEXT_PUBLIC_BLOCKFROST_API_KEY);
 	if (!wallet) {
 		alert("Please connect your wallet from transactions/mint_setup_token");
@@ -24,7 +24,6 @@ export const burnERC20Token = async (wallet: IWallet) => {
 	const setupUtxo: SetupUtxos = getSetupUtxo(hardCodedUtxo);
 
 	const setupTokenPolicyId = scripts(setupUtxo).setup.mint.hash;
-	const erc20TokenPolicyId = scripts(setupUtxo).erc20.mint.hash;
 
 	const blockfrost = getBlockFrost()!;
 
@@ -34,7 +33,7 @@ export const burnERC20Token = async (wallet: IWallet) => {
 		setupTokenPolicyId
 	);
 
-	const currentQuantity: number = getSetupDatum(scriptUtxos[0]);
+	// const currentQuantity: number = getSetupDatum(scriptUtxos[0]);
 
 	try {
 		const txBuilder = newTxBuilder(blockfrost);
@@ -47,13 +46,13 @@ export const burnERC20Token = async (wallet: IWallet) => {
 				scriptUtxos[0].output.address,
 				0
 			)
-			.txInRedeemerValue("", "Mesh")
+			.txInRedeemerValue(rBurnSetup, "JSON")
 			.txInInlineDatumPresent()
 			.txInScript(scripts(setupUtxo).erc20.spend.cbor)
 
 			.mintPlutusScriptV3()
 			.mint("-1", setupTokenPolicyId, "")
-			.mintingScript(scripts(setupUtxo).erc20.mint.cbor)
+			.mintingScript(scripts(setupUtxo).setup.mint.cbor)
 			.mintRedeemerValue(rBurn, "JSON")
 			.txInCollateral(
 				collateral.input.txHash,

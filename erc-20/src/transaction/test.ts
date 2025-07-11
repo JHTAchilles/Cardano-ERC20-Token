@@ -6,12 +6,12 @@ import { SetupUtxos } from "../../lib/types";
 export const hardCodedUtxo = {
 	input: {
 		txHash: "cd9830510d2b582f727c26df7e96a2bb90cc96fa83a531cd9f432bb39ab6033a",
-		outputIndex: 0,
+		outputIndex: 3,
 	},
 	output: {
 		address:
 			"addr_test1qre8tjm4mqhhxlzf9qqrn9r7fpy3nmsyfjpv9exw4uhjmpucfslttj9qrd94837wcn8uzwf5tg5dyjnweyvgw0z9ntwsl3q7la",
-		amount: [{ unit: "lovelace", quantity: "5000000" }],
+		amount: [{ unit: "lovelace", quantity: "1223498700" }],
 		dataHash: undefined,
 		plutusData: undefined,
 		scriptRef: undefined,

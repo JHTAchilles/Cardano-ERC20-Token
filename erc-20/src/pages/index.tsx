@@ -1,22 +1,52 @@
 import { burnERC20Token } from "@/transaction/burn_erc20_token";
 import { mintERC20Token } from "@/transaction/mint_erc20_token";
 import { mintSetupToken } from "@/transaction/mint_setup_token";
-import { IWallet } from "@meshsdk/core";
 import { useWallet } from "@meshsdk/react";
 import React, { useEffect, useState } from "react";
+// import { getCurrentQuantity, getSetupDatum } from "../../lib/utils";
+import { hardCodedUtxo } from "@/transaction/test";
+import { burnSetupToken } from "@/transaction/burn_setup_token";
 
 export default function Home() {
 	const { wallet, connected, connect } = useWallet();
 
 	const [balance, setUserBalance] = useState("");
-
-	const paramUtxo = get(wallet);
-
-	const [mintQuantity, setMintQuantity] = useState("");
+	const [inputField, setInputField] = useState("");
+	const [mintQuantity, setMintQuantity] = useState("0");
+	const [currentQuantity, setCurrentQuantity] = useState("0");
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setMintQuantity(e.target.value);
+		if (e.target.value) {
+			setInputField(e.target.value);
+			setMintQuantity(e.target.value);
+		} else {
+			setMintQuantity("0");
+			setInputField("");
+		}
 	};
+
+	const mintErc20Wrap = async () => {
+		const quantity = await mintERC20Token(wallet, +mintQuantity);
+		if (quantity) {
+			setCurrentQuantity(quantity.toString());
+		} else setCurrentQuantity("0");
+		setInputField("");
+		setMintQuantity("0");
+	};
+
+	const burnErc20Wrap = async () => {
+		const quantity = await burnERC20Token(wallet, -mintQuantity);
+		if (quantity) {
+			setCurrentQuantity(quantity.toString());
+		} else setCurrentQuantity("0");
+		setInputField("");
+		setMintQuantity("0");
+	};
+
+	// const getQuantity = async () => {
+	// 	const quantity: number = await getCurrentQuantity(hardCodedUtxo);
+	// 	setCurrentQuantity(quantity.toString());
+	// };
 
 	useEffect(() => {
 		const getWalletBalance = async () => {
@@ -39,25 +69,28 @@ export default function Home() {
 			alert("Please connect wallet");
 			return;
 		}
+
 		switch (buttonNumber) {
 			case "Mint Setup Token":
 				console.log("Minting Setup Token!");
 				mintSetupToken(wallet);
 				break;
+
 			case "Burn Setup Token":
 				console.log("Burning Setup Token!");
+				burnSetupToken(wallet);
 				break;
+
 			case "Mint Erc20 Token":
-				// console.log("hard coded utxo: ", hardCodedUtxo);
 				console.log("Minting ERC20 Token!");
-				mintERC20Token(wallet, +mintQuantity);
-				setMintQuantity("");
+				mintErc20Wrap();
 				break;
+
 			case "Burn Erc20 Token":
 				console.log("Burning ERC20 Token!");
-				burnERC20Token(wallet, -mintQuantity);
-				setMintQuantity("");
+				burnErc20Wrap();
 				break;
+
 			default:
 				break;
 		}
@@ -66,13 +99,6 @@ export default function Home() {
 	return (
 		<div className="bg-gray-800 text-white text-center">
 			<p>${balance} lovelace</p>
-			<button
-				onClick={() => {
-					console.log(paramUtxo);
-				}}
-			>
-				TEST BUTTON
-			</button>
 			<div
 				style={{
 					backgroundColor: "lightblue",
@@ -131,8 +157,9 @@ export default function Home() {
 				>
 					<input
 						type="number"
+						value={inputField}
 						className="[&::-webkit-inner-spin-button]:appearance-none"
-						value={mintQuantity}
+						//value={mintQuantity}
 						onChange={handleInputChange}
 						placeholder="Enter mint/burn amount here"
 						style={{
@@ -148,7 +175,7 @@ export default function Home() {
 						}}
 					/>
 
-					{mintQuantity && (
+					{
 						<div
 							style={{
 								backgroundColor: "black",
@@ -160,7 +187,18 @@ export default function Home() {
 						>
 							minting: {mintQuantity} ERC20 Token
 						</div>
-					)}
+					}
+				</div>
+				<div
+					style={{
+						backgroundColor: "black",
+						padding: "15px",
+						borderRadius: "8px",
+						textAlign: "center",
+						fontSize: "16px",
+					}}
+				>
+					current quantity: {currentQuantity} ERC20 Token
 				</div>
 
 				{/* ERC20 buttons */}
@@ -201,14 +239,4 @@ export default function Home() {
 			</div>
 		</div>
 	);
-}
-
-async function get(wallet: IWallet) {
-	// const changeAddress = await wallet.getChangeAddress();
-	const utxos = await wallet.getUtxos();
-	const collateral = (await wallet.getCollateral())[0];
-	const usedAddress = (await wallet.getUsedAddresses())[0];
-
-	const paramUtxo = utxos[0]!;
-	return paramUtxo;
 }

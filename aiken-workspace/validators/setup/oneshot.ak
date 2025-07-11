@@ -5,7 +5,7 @@ use cardano/transaction.{OutputReference, Transaction} as tx
 use types.{Burn, Mint, MintingAction}
 
 validator setup_token(utxo_ref: OutputReference) {
-  mint(rdmr: Action, policy_id: PolicyId, tx: Transaction) {
+  mint(rdmr: MintingAction, policy_id: PolicyId, tx: Transaction) {
     let Transaction { inputs, mint, .. } = tx
     expect [Pair(_asset_name, amount)] =
       mint

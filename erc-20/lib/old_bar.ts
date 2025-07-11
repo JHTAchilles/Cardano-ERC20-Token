@@ -44,7 +44,7 @@ export class Erc20SpendBlueprint extends SpendingBlueprint {
 		data: [Integer, PolicyId, PolicyId]
 	): [Integer, PolicyId, PolicyId] => data;
 	datum = (data: SetupTokenDatum): SetupTokenDatum => data;
-	redeemer = (data: SpendingAction): SpendingAction => data;
+	redeemer = (data: Data): Data => data;
 }
 
 export class SetupTokenMintBlueprint extends MintingBlueprint {
@@ -60,16 +60,12 @@ export class SetupTokenMintBlueprint extends MintingBlueprint {
 	params = (data: [OutputReference]): [OutputReference] => data;
 }
 
-export type MintingAction = Mint | Burn;
+export type Action = Mint | Burn;
 
 export type Mint = ConStr0<[]>;
 
 export type Burn = ConStr1<[]>;
 
-export type SpendingAction = MintBurnErc20 | BurnSetup;
-
-export type MintBurnErc20 = ConStr0<[]>;
-
-export type BurnSetup = ConStr1<[]>;
+export type Data = any;
 
 export type SetupTokenDatum = ConStr0<[Integer]>;

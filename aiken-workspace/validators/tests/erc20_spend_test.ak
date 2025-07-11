@@ -12,6 +12,7 @@ use tests/utils.{
   mock_incorrect_token_policy_id, mock_input_value, mock_output_value,
   mock_setup_token_policy_id,
 }
+use types.{MintBurnErc20}
 
 type Erc20TestCase {
   is_under_cap: Bool,
@@ -125,7 +126,7 @@ test t2_always_succeed() {
     mock_setup_token_policy_id,
     mock_erc20_token_policy_id,
     Some(mock_correct_input_datum),
-    None,
+    MintBurnErc20,
     mock_utxo_ref(0, 0),
     tx,
   )
@@ -152,7 +153,7 @@ test t2_mint_over_cap() fail {
     mock_setup_token_policy_id,
     mock_erc20_token_policy_id,
     Some(mock_correct_input_datum),
-    None,
+    MintBurnErc20,
     mock_utxo_ref(0, 0),
     tx,
   )
@@ -179,7 +180,7 @@ test t2_multiple_input() fail {
     mock_setup_token_policy_id,
     mock_erc20_token_policy_id,
     Some(mock_correct_input_datum),
-    None,
+    MintBurnErc20,
     mock_utxo_ref(0, 0),
     tx,
   )
@@ -206,7 +207,7 @@ test t2_multiple_output() fail {
     mock_setup_token_policy_id,
     mock_erc20_token_policy_id,
     Some(mock_correct_input_datum),
-    None,
+    MintBurnErc20,
     mock_utxo_ref(0, 0),
     tx,
   )
@@ -233,7 +234,7 @@ test t2_no_mint() fail {
     mock_setup_token_policy_id,
     mock_erc20_token_policy_id,
     Some(mock_correct_input_datum),
-    None,
+    MintBurnErc20,
     mock_utxo_ref(0, 0),
     tx,
   )
@@ -260,7 +261,7 @@ test t2_incorrect_token_minted() fail {
     mock_setup_token_policy_id,
     mock_erc20_token_policy_id,
     Some(mock_correct_input_datum),
-    None,
+    MintBurnErc20,
     mock_utxo_ref(0, 0),
     tx,
   )
@@ -287,7 +288,7 @@ test t2_incorrect_input_address() fail {
     mock_setup_token_policy_id,
     mock_erc20_token_policy_id,
     Some(mock_correct_input_datum),
-    None,
+    MintBurnErc20,
     mock_utxo_ref(0, 0),
     tx,
   )
@@ -314,7 +315,7 @@ test t2_incorrect_input_datum() fail {
     mock_setup_token_policy_id,
     mock_erc20_token_policy_id,
     Some(mock_correct_input_datum),
-    None,
+    MintBurnErc20,
     mock_utxo_ref(0, 0),
     tx,
   )
@@ -341,7 +342,7 @@ test t2_incorrect_output_address() fail {
     mock_setup_token_policy_id,
     mock_erc20_token_policy_id,
     Some(mock_correct_input_datum),
-    None,
+    MintBurnErc20,
     mock_utxo_ref(0, 0),
     tx,
   )
@@ -368,7 +369,7 @@ test t2_incorrect_output_datum() fail {
     mock_setup_token_policy_id,
     mock_erc20_token_policy_id,
     Some(mock_correct_input_datum),
-    None,
+    MintBurnErc20,
     mock_utxo_ref(0, 0),
     tx,
   )

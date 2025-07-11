@@ -1,6 +1,6 @@
 import { OfflineEvaluator } from "@meshsdk/core-csl";
 import { IWallet, UTxO } from "@meshsdk/core";
-import { rBurn, SetupUtxos } from "../../lib/types";
+import { rBurn, rMintBurnErc20, SetupUtxos } from "../../lib/types";
 import { scripts, setupTokenDatum } from "../../lib/constant";
 import { hardCodedUtxo } from "./test";
 import {
@@ -60,7 +60,7 @@ export const burnERC20Token = async (wallet: IWallet, mintQuantity: number) => {
 				scriptUtxos[0].output.address,
 				0
 			)
-			.txInRedeemerValue("", "Mesh")
+			.txInRedeemerValue(rMintBurnErc20, "JSON")
 			.txInInlineDatumPresent()
 			.txInScript(scripts(setupUtxo).erc20.spend.cbor)
 			.txOut(scriptAddress, [
@@ -92,6 +92,7 @@ export const burnERC20Token = async (wallet: IWallet, mintQuantity: number) => {
 		console.log("setupTokenPolicyId: ", setupTokenPolicyId);
 		console.log("erc20TokenPolicyId: ", erc20TokenPolicyId);
 		console.log("updated quantity: ", currentQuantity + mintQuantity);
+		return currentQuantity + mintQuantity;
 	} catch (e) {
 		console.error(e);
 	}

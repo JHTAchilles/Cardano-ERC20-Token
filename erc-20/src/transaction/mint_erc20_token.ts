@@ -1,6 +1,6 @@
 import { OfflineEvaluator } from "@meshsdk/core-csl";
 import { IWallet, UTxO } from "@meshsdk/core";
-import { rMint, SetupUtxos } from "../../lib/types";
+import { rMint, rMintBurnErc20, SetupUtxos } from "../../lib/types";
 import { scripts, setupTokenDatum } from "../../lib/constant";
 import { hardCodedUtxo } from "./test";
 import {
@@ -9,6 +9,7 @@ import {
 	getSetupUtxo,
 	newTxBuilder,
 } from "../../lib/utils";
+import { useState } from "react";
 
 export const mintERC20Token = async (wallet: IWallet, mintQuantity: number) => {
 	console.log(process.env.NEXT_PUBLIC_BLOCKFROST_API_KEY);
@@ -43,9 +44,10 @@ export const mintERC20Token = async (wallet: IWallet, mintQuantity: number) => {
 
 	const blockfrost = getBlockFrost()!;
 
-	const scriptAddress = scripts(setupUtxo).erc20.spend.address;
+	const spendScriptAddress = scripts(setupUtxo).erc20.spend.address;
+	console.log("spending script address: ", spendScriptAddress);
 	const scriptUtxos: UTxO[] = await blockfrost.fetchAddressUTxOs(
-		scriptAddress,
+		spendScriptAddress,
 		setupTokenPolicyId
 	);
 
@@ -67,10 +69,10 @@ export const mintERC20Token = async (wallet: IWallet, mintQuantity: number) => {
 				scriptUtxos[0].output.address,
 				0
 			)
-			.txInRedeemerValue("", "Mesh")
+			.txInRedeemerValue(rMintBurnErc20, "JSON")
 			.txInInlineDatumPresent()
 			.txInScript(scripts(setupUtxo).erc20.spend.cbor)
-			.txOut(scriptAddress, [
+			.txOut(spendScriptAddress, [
 				{
 					unit: setupTokenPolicyId,
 					quantity: "1",
@@ -99,6 +101,7 @@ export const mintERC20Token = async (wallet: IWallet, mintQuantity: number) => {
 		console.log("setupTokenPolicyId: ", setupTokenPolicyId);
 		console.log("erc20TokenPolicyId: ", erc20TokenPolicyId);
 		console.log("updated quantity: ", currentQuantity + mintQuantity);
+		return currentQuantity + mintQuantity;
 	} catch (e) {
 		console.error(e);
 	}
